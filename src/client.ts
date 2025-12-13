@@ -47,7 +47,8 @@ export class DarajaClient {
   }
 
   /**
-   * Get access token from M-Pesa API with caching
+   *@description Get access token from M-Pesa API with caching
+  * @return {Promise<string>} Access token
    */
   private async getAccessToken(): Promise<string> {
     // Return cached token if still valid
