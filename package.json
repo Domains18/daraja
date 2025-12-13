@@ -1,5 +1,5 @@
 {
-  "name": "@safaricom/daraja-sdk",
+  "name": "daraja-sdk",
   "version": "1.0.0",
   "description": "Type-safe Safaricom Daraja API SDK for Node.js with excellent developer experience",
   "main": "dist/index.js",
