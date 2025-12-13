@@ -1,18 +1,37 @@
 {
-  "name": "daraja",
+  "name": "@safaricom/daraja-sdk",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Type-safe Safaricom Daraja API SDK for Node.js with excellent developer experience",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Domains18/daraja.git"
   },
-  "keywords": [],
+  "keywords": [
+    "safaricom",
+    "daraja",
+    "mpesa",
+    "stk-push",
+    "mobile-money",
+    "payment",
+    "kenya",
+    "api",
+    "sdk",
+    "typescript"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Domains18/daraja/issues"
@@ -24,5 +43,8 @@
   "devDependencies": {
     "@types/node": "^25.0.1",
     "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

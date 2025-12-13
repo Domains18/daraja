@@ -1,88 +1,64 @@
-import axios, { AxiosInstance } from "axios";
-import { DarajaConfig, StkPushPayload, StkPushResponse } from "./types";
+import { DarajaClient } from "./client";
+import { DarajaConfig } from "./types";
 
+/**
+ * Main Daraja SDK class providing environment-specific clients
+ *
+ * @example
+ * ```typescript
+ * const daraja = new Daraja({
+ *   consumerKey: 'your-key',
+ *   consumerSecret: 'your-secret'
+ * });
+ *
+ * // Use sandbox environment
+ * const response = await daraja.sandbox.stkPush({
+ *   businessShortCode: '174379',
+ *   passKey: 'your-passkey',
+ *   amount: 100,
+ *   phoneNumber: '254712345678',
+ *   callBackURL: 'https://example.com/callback',
+ *   accountReference: 'Test123',
+ *   transactionDesc: 'Payment for goods'
+ * });
+ *
+ * // Use production environment
+ * const prodResponse = await daraja.production.stkPush({...});
+ * ```
+ */
 export class Daraja {
-  private consumerKey: string;
-  private consumerSecret: string;
-  private baseURL: string;
-  private client: AxiosInstance;
+  private config: DarajaConfig;
+  private _sandbox: DarajaClient | null = null;
+  private _production: DarajaClient | null = null;
 
   constructor(config: DarajaConfig) {
-    this.consumerKey = config.consumerKey;
-    this.consumerSecret = config.consumerSecret;
-    this.baseURL =
-      config.environment === "production"
-        ? "https://api.safaricom.co.ke"
-        : "https://sandbox.safaricom.co.ke";
-
-    this.client = axios.create({
-      baseURL: this.baseURL,
-      timeout: config.timeout || 10000,
-    });
+    this.config = config;
   }
 
-  private getTimeStamp(): string {
-    return new Date()
-      .toISOString()
-      .replace(/[-:TZ.]/g, "")
-      .slice(0, 14);
-  }
-
-  private async getAccessToken(): Promise<string> {
-    try {
-      const credentials = Buffer.from(
-        `${this.consumerKey}:${this.consumerSecret}`
-      ).toString("base64");
-      const response = await this.client.get(
-        "/oauth/v1/generate?grant_type=client_credentials",
-        {
-          headers: {
-            Authorization: `Basic ${credentials}`,
-          },
-        }
-      );
-      return response.data.access_token;
-    } catch (error) {
-      throw new Error(`Failed to get access token ${error}`);
+  /**
+   * Get sandbox environment client
+   */
+  public get sandbox(): DarajaClient {
+    if (!this._sandbox) {
+      this._sandbox = new DarajaClient(this.config, "sandbox");
     }
+    return this._sandbox;
   }
 
-  public async sendStkPush(payload: StkPushPayload): Promise<StkPushResponse> {
-    const token = await this.getAccessToken();
-    const timestamp = this.getTimeStamp();
-
-    // Auto-generate the password base64(ShortCode + Passkey + Timestamp)
-    const password = Buffer.from(
-      `${payload.businessShortCode}${payload.passKey}${timestamp}`
-    ).toString("base64");
-
-    const requestBody = {
-      BusinessShortCode: payload.businessShortCode,
-      Password: password,
-      Timestamp: timestamp,
-      TransactionType: "CustomerPayBillOnline",
-      Amount: payload.amount,
-      PartyA: payload.phoneNumber,
-      PartyB: payload.businessShortCode,
-      PhoneNumber: payload.phoneNumber,
-      CallBackURL: payload.callBackURL,
-      AccountReference: payload.accountReference,
-      TransactionDesc: payload.transactionDesc,
-    };
-
-    try {
-      const response = await this.client.post(
-        "/mpesa/stkpush/v1/processrequest",
-        requestBody,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error: any) {
-      throw new Error(`STK Push failed: ${error.message}`);
+  /**
+   * Get production environment client
+   */
+  public get production(): DarajaClient {
+    if (!this._production) {
+      this._production = new DarajaClient(this.config, "production");
     }
+    return this._production;
   }
 }
+
+// Export types for consumer use
+export { DarajaClient } from "./client";
+export * from "./types";
+
+// Default export
+export default Daraja;
