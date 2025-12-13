@@ -30,7 +30,10 @@
     "sdk",
     "typescript"
   ],
-  "author": "",
+  "author": {
+    "name": "Domains18",
+    "email": "gibsonsgibson88@gmail.com"
+  },
   "license": "MIT",
   "type": "commonjs",
   "bugs": {
